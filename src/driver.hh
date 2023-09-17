@@ -13,15 +13,6 @@
 
 /* -------------------------------------------------------------------------- */
 
-/* Tell Flex the lexer's prototype... */
-#define YY_DECL  yy::parser::symbol_type yylex( driver & drv )
-
-/* ... and declare it for the parser's sake. */
-YY_DECL;
-
-
-/* -------------------------------------------------------------------------- */
-
 /** @brief Conducting the whole scanning and parsing of Calc++. */
 class driver
 {
@@ -57,6 +48,15 @@ class driver
     void scan_end();
 
 };  /* End class `driver' */
+
+
+/* -------------------------------------------------------------------------- */
+
+/* Tell Flex the lexer's prototype... */
+#define YY_DECL  yy::parser::symbol_type yylex( driver & drv )
+
+/* ... and declare it for the parser's sake. */
+YY_DECL;
 
 
 /* -------------------------------------------------------------------------- *

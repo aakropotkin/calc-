@@ -1,0 +1,19 @@
+#+TITLE: Calc++
+
+An example project using Bison and Flex to create a C++ parser.
+
+This is adapted from the GNU Manual, which contains a few minor mistakes that
+had to be corrected in order to build successfully.
+
+
+** Usage
+
+#+BEGIN_SRC shell
+$ make -C src;
+$ ./src/calc++ <(
+    echo 'three := 3';
+    echo 'seven := one + two * three';
+    echo 'seven * seven';
+  );
+49
+#+END_SRC

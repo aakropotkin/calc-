@@ -5,6 +5,7 @@
  *
  * -------------------------------------------------------------------------- */
 
+#include <unistd.h>
 #include <cerrno>
 #include <climits>
 #include <cstdlib>
@@ -30,12 +31,6 @@
 
 %option noyywrap nounput noinput batch debug
 
-%{
-/** @brief Make a number symbol corresponding to the value in @a str. */
-  yy::parser::symbol_type
-make_NUMBER( const std::string & str, const yy::parser::location_type & loc )
-%}
-
 
 id    [a-zA-Z][a-zA-Z_0-9]*
 int   [0-9]+
@@ -43,21 +38,20 @@ blank [ \t\r]
 
 %{
 /* Code run each time a pattern is matched. */
-#define YY_USER_ACTION  loc.columns (yyleng);
+#define YY_USER_ACTION  loc.columns( yyleng );
 %}
-
 
 %%
 
 %{
 /* A handy shortcut to the location held by the driver. */
-yy::location& loc = drv.location;
+yy::location & loc = drv.location;
 /* Code run each time yylex is called. */
 loc.step ();
 %}
 
 {blank}+   { loc.step (); }
-\n+        { loc.lines (yyleng); loc.step (); }
+\n+        { loc.lines( yyleng ); loc.step (); }
 
 "-"        { return yy::parser::make_MINUS( loc ); }
 "+"        { return yy::parser::make_PLUS( loc ); }
@@ -67,7 +61,19 @@ loc.step ();
 " )"       { return yy::parser::make_RPAREN( loc); }
 ":="       { return yy::parser::make_ASSIGN( loc ); }
 
-{int}      { return yy::parser::make_NUMBER( n, loc ); }
+{int} {
+  errno = 0;
+  long n = strtol( yytext, NULL, 10 );
+  if ( ! ( ( INT_MIN <= n ) && ( n <= INT_MAX ) && ( errno != ERANGE ) ) )
+    {
+      throw yy::parser::syntax_error(
+        loc
+      , "integer is out of range: " + std::string( yytext )
+      );
+    }
+  return yy::parser::make_NUMBER( static_cast<int>( n ), loc );
+}
+
 {id}       { return yy::parser::make_IDENTIFIER( yytext, loc ); }
 .          {
              throw yy::parser::syntax_error(
@@ -75,28 +81,9 @@ loc.step ();
                    , "invalid character: " + std::string( yytext )
                    );
            }
-<<EOF>>    return yy::parser::make_END (loc);
+<<EOF>>    { return yy::parser::make_YYEOF( loc ); }
 
 %%
-
-/* -------------------------------------------------------------------------- */
-
-/** @brief Make a number symbol corresponding to the value in @a str. */
-  yy::parser::symbol_type
-make_NUMBER( const std::string & str, const yy::parser::location_type & loc )
-{
-  errno = 0;
-
-  long n = strtol( str.c_str(), NULL, 10 );
-
-  if ( ! ( ( INT_MIN <= n ) && ( n <= INT_MAX ) && ( errno != ERANGE ) ) )
-    {
-      throw yy::parser::syntax_error( loc, "integer is out of range: " + str );
-    }
-
-  return yy::parser::make_NUMBER( static_cast<int>( n ), loc );
-}
-
 
 /* -------------------------------------------------------------------------- */
 

@@ -18,7 +18,7 @@
 /* -------------------------------------------------------------------------- */
 
 /* This block is shared by the parser and lexer */
-%code {
+%code requires {
 
 #include <string>
 
@@ -28,6 +28,9 @@ class driver;
 
 
 /* -------------------------------------------------------------------------- */
+
+/* The parsing context */
+%param { driver & drv }
 
 %locations
 
@@ -104,7 +107,7 @@ exp:
 /* -------------------------------------------------------------------------- */
 
   void
-yy::parse::error( const location_type & loc, const std::string & msg )
+yy::parser::error( const location_type & loc, const std::string & msg )
 {
   std::cerr << loc << ": " << msg << std::endl;
 }
