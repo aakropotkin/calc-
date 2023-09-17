@@ -73,16 +73,26 @@
 
 
     devShells = eachDefaultSystemMap ( system: let
-      pkgsFor  = nixpkgs.legacyPackages.${system}.extend overlays.default;
-      calc-cpp = pkgsFor.mkShell {
+      pkgsFor        = nixpkgs.legacyPackages.${system}.extend overlays.default;
+      calc-cpp-shell = pkgsFor.mkShell {
+        name     = "calc-cpp-shell";
         packages = [
           pkgsFor.bison
           pkgsFor.flex
         ];
+        shellHook = ''
+          shopt -s autocd;
+
+          alias gs='git status';
+          alias ga='git add';
+          alias gc='git commit -am';
+          alias gl='git pull';
+          alias gp='git push';
+        '';
       };
     in {
-      inherit calc-cpp;
-      default = calc-cpp;
+      inherit calc-cpp-shell;
+      default = calc-cpp-shell;
     } );
 
 

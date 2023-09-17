@@ -6,6 +6,9 @@ CXX   = c++
 FLEX  = flex
 RM    = rm -f
 
+.PHONY: all clean FORCE
+.DEFAULT_GOAL = all
+
 all: calc++
 
 %.cc %.hh: %.yy
@@ -24,5 +27,5 @@ calc++.o: parser.hh
 parser.o: parser.hh
 scanner.o: parser.hh
 
-clean:
+clean: FORCE
 	$(RM) calc++ *.o parser.hh parser.cc scanner.cc

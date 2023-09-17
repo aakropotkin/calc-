@@ -47,18 +47,18 @@ blank [ \t\r]
 /* A handy shortcut to the location held by the driver. */
 yy::location & loc = drv.location;
 /* Code run each time yylex is called. */
-loc.step ();
+loc.step();
 %}
 
-{blank}+   { loc.step (); }
-\n+        { loc.lines( yyleng ); loc.step (); }
+{blank}+   { loc.step(); }
+\n+        { loc.lines( yyleng ); loc.step(); }
 
 "-"        { return yy::parser::make_MINUS( loc ); }
 "+"        { return yy::parser::make_PLUS( loc ); }
 "*"        { return yy::parser::make_STAR( loc ); }
 "/"        { return yy::parser::make_SLASH( loc ); }
 "( "       { return yy::parser::make_LPAREN(loc ); }
-" )"       { return yy::parser::make_RPAREN( loc); }
+" )"       { return yy::parser::make_RPAREN( loc ); }
 ":="       { return yy::parser::make_ASSIGN( loc ); }
 
 {int} {
@@ -88,17 +88,17 @@ loc.step ();
 /* -------------------------------------------------------------------------- */
 
   void
-driver::scan_begin ()
+driver::scan_begin()
 {
   yy_flex_debug = trace_scanning;
 
-  if ( file.empty() || ( file == "-" ) )
+  if ( this->file.empty() || ( this->file == "-" ) )
     {
       yyin = stdin;
     }
-  else if ( ! ( ( yyin = fopen( file.c_str(), "r" ) ) ) )
+  else if ( ! ( ( yyin = fopen( this->file.c_str(), "r" ) ) ) )
     {
-      std::cerr << "cannot open " << file << ": " << strerror( errno )
+      std::cerr << "cannot open " << this->file << ": " << strerror( errno )
                 << std::endl;
       exit( EXIT_FAILURE );
     }
@@ -107,7 +107,7 @@ driver::scan_begin ()
 
 /* -------------------------------------------------------------------------- */
 
-void driver::scan_end () { fclose( yyin ); }
+void driver::scan_end() { fclose( yyin ); }
 
 
 /* -------------------------------------------------------------------------- *
